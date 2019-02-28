@@ -29,14 +29,14 @@ if __name__ == '__main__':
 			random_ten_idx = np.random.permutation(rows)[:10]
 			random_ten = A[random_ten_idx,:]
 
-			score = get_score(random_ten, first_im)
+			score = get_score(random_ten, cur_im)
 			if score < 1:
 				break #adding more slides won't add to show
 
 			slideshow_list.append([])
 		else:
 			#just check them all
-			score = get_score(random_ten, first_im)
+			score = get_score(A, cur_im)
 			if score < 1:
 				break #adding more slides won't add to show
 			slideshow_list.append([])
