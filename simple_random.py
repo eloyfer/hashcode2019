@@ -1,6 +1,7 @@
 import numpy as np
 from read_data import read_data
 from random import shuffle
+import argparse
 
 def get_score(array):
 	score1 = np.dot(array, array.T)
@@ -13,11 +14,15 @@ def get_score(array):
 
 if __name__ == '__main__':
 
+	parser = argparse.ArgumentParser()
+	parser.add_argument('input')
+	args = parser.parse_args()
+
 	RANDOM_SAMPLES_PER_CHOICE = 10
 	# A = read_data('b_lovely_landscapes.txt')
 	# A = read_data('d_pet_pictures.txt')
-	A = read_data('c_memorable_moments.txt')
-
+	# A = read_data('c_memorable_moments.txt')
+	A, im_inds = read_data(args.input)
 	#calc scores
 	adj = get_score(A)
 
@@ -45,6 +50,16 @@ if __name__ == '__main__':
 		# add chosen index to slideshow + remove from indices list
 		slideshow_list.append(chosen_idx)
 		indicies.remove(chosen_idx)
+
+	with open(args.input + '.out', 'w') as fid:
+		fid.write(str(len(slideshow_list)) + '\n')
+		for elem in slideshow_list:
+			inds = im_inds[elem]
+			if type(inds) == int:
+				inds = [inds]
+			inds = list(inds)
+			inds = [str(x) for x in inds]
+			fid.write(' '.join(inds) + '\n')
 
 	print(slideshow_list)
 	print(len(slideshow_list))
