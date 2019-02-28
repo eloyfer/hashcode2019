@@ -26,7 +26,7 @@ def read_data(filename):
         tags[tg] = tag_ind
         tag_ind += 1
 
-    cur_tags = list(map(lambda x: tags[x], spl[2:]))
+    cur_tags = sorted(list(map(lambda x: tags[x], spl[2:])))
     if spl[0] == 'H':
       hims.append(cur_tags)
     elif spl[0] == 'V':
@@ -34,11 +34,7 @@ def read_data(filename):
     else:
       print('Error in file format: %s' % line)
       exit()
-    
-  # print(len(tags.keys()))
-  # tags = [key for key,val in tags.items() if val < len(vims) + len(hims)]
-  # tags = list(tags.keys())
-  # tags.sort()
+
   print('num vertical images:', len(vims))
   print('num horizontal images:', len(hims))
   print('num tags:', len(tags))
@@ -46,7 +42,7 @@ def read_data(filename):
   if len(vims) > 0:
     group1 = np.random.choice(len(vims), size=len(vims)//2, replace=False)
     group2 = list(set(list(range(len(vims)))) - set(group1))
-    vims2 = [set(vims[group1[i]] + vims[group2[i]]) for i in range(len(vims)//2)]
+    vims2 = [sorted(list(set(vims[group1[i]] + vims[group2[i]]))) for i in range(len(vims)//2)]
 
     hims = hims + vims2
 
@@ -54,6 +50,7 @@ def read_data(filename):
   # result = sparse.dok_matrix
   for i, im in enumerate(hims):
     # print(i)
+    # print(im)
     result[i,im] = 1
     # for tag in im:
       # result[i,tags.index(tag)] = 1
@@ -66,5 +63,6 @@ if __name__ == '__main__':
   # mat = read_data('c_memorable_moments.txt')
   print(mat.shape)
   print(mat)
-
+  print('nonzeros of row 0:', np.nonzero(mat[0]))
+  print('num nonzero of row 1:', mat[1].sum())
 
