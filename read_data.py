@@ -11,13 +11,14 @@ def read_data(filename):
   tags = dict()
   hims = []
   vims = []
+  hims_inds = []
+  vims_inds = []
+  first_line = True
   i = 0
-  N = 0
   tag_ind = 0
   for line in open(filename, 'r'):
-    if i == 0: # ignore first line
-      i += 1
-      N = int(line)
+    if first_line: # ignore first line
+      first_line = False
       continue
 
     spl = line.split()
@@ -29,8 +30,12 @@ def read_data(filename):
     cur_tags = sorted(list(map(lambda x: tags[x], spl[2:])))
     if spl[0] == 'H':
       hims.append(cur_tags)
+      hims_inds.append(i)
+      i += 1
     elif spl[0] == 'V':
       vims.append(cur_tags)
+      vims_inds.append(i)
+      i += 1
     else:
       print('Error in file format: %s' % line)
       exit()
@@ -39,12 +44,15 @@ def read_data(filename):
   print('num horizontal images:', len(hims))
   print('num tags:', len(tags))
   # order vertical images in pairs randomly
+  im_inds = hims_inds
   if len(vims) > 0:
     group1 = np.random.choice(len(vims), size=len(vims)//2, replace=False)
     group2 = list(set(list(range(len(vims)))) - set(group1))
     vims2 = [sorted(list(set(vims[group1[i]] + vims[group2[i]]))) for i in range(len(vims)//2)]
 
     hims = hims + vims2
+    vims_inds = np.array(vims_inds)
+    im_inds += list(zip(vims_inds[group1], vims_inds[group2]))
 
   result = np.zeros([len(hims),len(tags)], int)
   # result = sparse.dok_matrix
@@ -55,12 +63,13 @@ def read_data(filename):
     # for tag in im:
       # result[i,tags.index(tag)] = 1
 
-  return result
+  return result, im_inds
 
 
 if __name__ == '__main__':
-  mat = read_data('b_lovely_landscapes.txt')
-  # mat = read_data('c_memorable_moments.txt')
+  # mat, im_inds = read_data('b_lovely_landscapes.txt')
+  mat, im_inds = read_data('c_memorable_moments.txt')
+  print(im_inds)
   print(mat.shape)
   print(mat)
   print('nonzeros of row 0:', np.nonzero(mat[0]))
