@@ -13,6 +13,7 @@ def read_data(filename):
   vims = []
   i = 0
   N = 0
+  tag_ind = 0
   for line in open(filename, 'r'):
     if i == 0: # ignore first line
       i += 1
@@ -20,24 +21,24 @@ def read_data(filename):
       continue
 
     spl = line.split()
+    for tg in spl[2:]:
+      if tg not in tags:
+        tags[tg] = tag_ind
+        tag_ind += 1
+
+    cur_tags = list(map(lambda x: tags[x], spl[2:]))
     if spl[0] == 'H':
-      hims.append(spl[2:])
+      hims.append(cur_tags)
     elif spl[0] == 'V':
-      vims.append(spl[2:])
+      vims.append(cur_tags)
     else:
       print('Error in file format: %s' % line)
       exit()
-    for tg in spl[2:]:
-      if tg not in tags:
-        tags[tg] = 1
-      else:
-        tags[tg] += 1
-    # tags.update(spl[2:])
-
+    
   # print(len(tags.keys()))
-  # tags = [key for key,val in tags.items() if val > 1]
-  tags = list(tags.keys())
-  tags.sort()
+  # tags = [key for key,val in tags.items() if val < len(vims) + len(hims)]
+  # tags = list(tags.keys())
+  # tags.sort()
   print('num vertical images:', len(vims))
   print('num horizontal images:', len(hims))
   print('num tags:', len(tags))
@@ -52,8 +53,8 @@ def read_data(filename):
   result = np.zeros([len(hims),len(tags)], int)
   # result = sparse.dok_matrix
   for i, im in enumerate(hims):
-    inds = list(map(lambda x: tags.index(x), im))
-    result[i,inds] = 1
+    # print(i)
+    result[i,im] = 1
     # for tag in im:
       # result[i,tags.index(tag)] = 1
 
