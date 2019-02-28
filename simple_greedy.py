@@ -16,14 +16,20 @@ def get_score(array):
 
 if __name__ == '__main__':
 
+	print('start simple_greedy')
+
 	parser = argparse.ArgumentParser()
 	parser.add_argument('input')
 	args = parser.parse_args()
 
 	from read_data import read_data
-	A, im_inds = read_data(args.input)
+	print('read data..')
+	A, im_inds = read_data(args.input, True)
+	print('done read data')
 
+	print('get score')
 	score_mat = get_score(A)
+	print('done get score')
 
 	start = np.argmax(score_mat)
 	i1, i2 = np.unravel_index(start, score_mat.shape)

@@ -1,8 +1,9 @@
 import numpy as np
 import os
-from scipy import sparse
+from scipy.sparse import dok_matrix
+from scipy.sparse import csr_matrix
 
-def read_data(filename):
+def read_data(filename, sparse=False):
 
   if not os.path.isfile(filename):
     print('Error in file name! %s' % filename)
@@ -54,8 +55,11 @@ def read_data(filename):
     vims_inds = np.array(vims_inds)
     im_inds += list(zip(vims_inds[group1], vims_inds[group2]))
 
-  result = np.zeros([len(hims),len(tags)], int)
-  # result = sparse.dok_matrix
+  if not sparse:
+    result = np.zeros([len(hims),len(tags)], np.int8)
+  else:
+    result = dok_matrix((len(hims),len(tags)), np.int8)
+
   for i, im in enumerate(hims):
     # print(i)
     # print(im)
@@ -63,15 +67,18 @@ def read_data(filename):
     # for tag in im:
       # result[i,tags.index(tag)] = 1
 
+  result = result.tocsr().astype(np.int8)
   return result, im_inds
 
 
 if __name__ == '__main__':
-  # mat, im_inds = read_data('b_lovely_landscapes.txt')
-  mat, im_inds = read_data('c_memorable_moments.txt')
-  print(im_inds)
+  mat, im_inds = read_data('b_lovely_landscapes.txt', sparse=True)
+  # mat, im_inds = read_data('c_memorable_moments.txt', sparse=True)
+  # print(im_inds)
   print(mat.shape)
-  print(mat)
+  print(type(mat))
+  # print(mat)
   print('nonzeros of row 0:', np.nonzero(mat[0]))
   print('num nonzero of row 1:', mat[1].sum())
+  print('row 2:', mat[2])
 
