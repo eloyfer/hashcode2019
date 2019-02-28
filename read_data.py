@@ -67,7 +67,8 @@ def read_data(filename, sparse=False):
     # for tag in im:
       # result[i,tags.index(tag)] = 1
 
-  result = result.tocsr().astype(np.int8)
+  if sparse:
+    result = result.tocsr().astype(np.int8)
   return result, im_inds
 
 
