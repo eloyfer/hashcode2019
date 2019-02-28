@@ -11,6 +11,8 @@ def get_score(array, row):
 	return adj
 
 if __name__ == '__main__':
+	# from read_data import read_data
+	# A = read_data('a_example.txt')
 	A = np.array([[0,1,1],[0,1,0]])
 	A = np.append(A, np.array([range(A.shape[0])]).T, axis=1)
 
