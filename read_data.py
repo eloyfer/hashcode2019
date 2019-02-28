@@ -1,5 +1,6 @@
 import numpy as np
 import os
+from scipy import sparse
 
 def read_data(filename):
 
@@ -7,7 +8,7 @@ def read_data(filename):
     print('Error in file name! %s' % filename)
     exit()
 
-  tags = set()
+  tags = dict()
   hims = []
   vims = []
   i = 0
@@ -26,8 +27,20 @@ def read_data(filename):
     else:
       print('Error in file format: %s' % line)
       exit()
-    tags.update(spl[2:])
+    for tg in spl[2:]:
+      if tg not in tags:
+        tags[tg] = 1
+      else:
+        tags[tg] += 1
+    # tags.update(spl[2:])
 
+  # print(len(tags.keys()))
+  # tags = [key for key,val in tags.items() if val > 1]
+  tags = list(tags.keys())
+  tags.sort()
+  print('num vertical images:', len(vims))
+  print('num horizontal images:', len(hims))
+  print('num tags:', len(tags))
   # order vertical images in pairs randomly
   if len(vims) > 0:
     group1 = np.random.choice(len(vims), size=len(vims)//2, replace=False)
@@ -36,17 +49,20 @@ def read_data(filename):
 
     hims = hims + vims2
 
-  tags = sorted(list(tags))
   result = np.zeros([len(hims),len(tags)], int)
+  # result = sparse.dok_matrix
   for i, im in enumerate(hims):
-    for tag in im:
-      result[i,tags.index(tag)] = 1
+    inds = list(map(lambda x: tags.index(x), im))
+    result[i,inds] = 1
+    # for tag in im:
+      # result[i,tags.index(tag)] = 1
 
   return result
 
 
 if __name__ == '__main__':
   mat = read_data('b_lovely_landscapes.txt')
+  # mat = read_data('c_memorable_moments.txt')
   print(mat.shape)
   print(mat)
 
